@@ -1,21 +1,19 @@
 package com.example.chatcompose
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.collectAsState
+import com.example.MainActivityViewModel
+import com.example.chatcompose.screens.LoginScreen
 import com.example.chatcompose.ui.theme.ChatComposeTheme
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.coroutines.flow.asStateFlow
 
 class MainActivity : ComponentActivity() {
     private val TAG = "MainActivity"
@@ -24,29 +22,17 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ChatComposeTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val mainViewModel:MainActivityViewModel by viewModels<MainActivityViewModel>()
+                val loginState = mainViewModel.loginState.asStateFlow().collectAsState()
+                Column {
+                    LoginScreen(loginState) { email, password ->
+                        mainViewModel.login(email, password)
+                    }
+                    AnimatedVisibility(visible = loginState.value.error.isEmpty()) {
+                        CircularProgressIndicator()
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ChatComposeTheme {
-        Greeting("Android")
     }
 }
