@@ -21,7 +21,7 @@ class MainActivityViewModel: ViewModel() {
             }
         }.addOnFailureListener {ex->
             loginState.update {
-                it.copy(false, ex.printStackTrace().toString(), null)
+                it.copy(false, ex.localizedMessage!!, null)
             }
         }
     }

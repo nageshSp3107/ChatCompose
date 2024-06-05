@@ -1,14 +1,11 @@
 package com.example.chatcompose
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.collectAsState
 import com.example.MainActivityViewModel
 import com.example.chatcompose.screens.LoginScreen
@@ -27,9 +24,6 @@ class MainActivity : ComponentActivity() {
                 Column {
                     LoginScreen(loginState) { email, password ->
                         mainViewModel.login(email, password)
-                    }
-                    AnimatedVisibility(visible = loginState.value.error.isEmpty()) {
-                        CircularProgressIndicator()
                     }
                 }
             }

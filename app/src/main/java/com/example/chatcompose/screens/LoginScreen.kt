@@ -1,6 +1,7 @@
 package com.example.chatcompose.screens
 
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +42,11 @@ fun LoginScreen(loginState: State<LoginState>, onLoginClick: (String, String) ->
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var hasLogin by remember { mutableStateOf(false) }
+    val context =  LocalContext.current
+    LaunchedEffect(key1 = loginState.value.error.isNotEmpty()) {
+            Toast.makeText(context, loginState.value.error, Toast.LENGTH_SHORT).show()
+            hasLogin = false
+    }
 
     Column(
         modifier = Modifier
@@ -88,10 +96,14 @@ fun LoginScreen(loginState: State<LoginState>, onLoginClick: (String, String) ->
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
-                loginState.value.isSuccess = true
+                hasLogin = true
                 onLoginClick(username,password)
             }) {
             Text("Login")
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        AnimatedVisibility(visible = hasLogin) {
+            CircularProgressIndicator()
         }
         Spacer(modifier = Modifier.weight(0.5f))
     }
