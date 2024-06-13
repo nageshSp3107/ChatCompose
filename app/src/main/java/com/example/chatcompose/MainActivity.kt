@@ -20,11 +20,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             ChatComposeTheme {
                 val mainViewModel:MainActivityViewModel by viewModels<MainActivityViewModel>()
-                val loginState = mainViewModel.loginState.asStateFlow().collectAsState()
+                val loginState = mainViewModel.loginState.collectAsState().value
+                val errorState = mainViewModel.errorState.collectAsState().value
                 Column {
-                    LoginScreen(loginState) { email, password ->
+                    LoginScreen(errorState, { email, password ->
                         mainViewModel.login(email, password)
-                    }
+                    },{
+                      mainViewModel.clearErrorState()
+                    })
                 }
             }
         }

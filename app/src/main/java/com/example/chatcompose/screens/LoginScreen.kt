@@ -38,14 +38,17 @@ import com.example.chatcompose.LoginState
 import com.example.chatcompose.ui.theme.ChatComposeTheme
 
 @Composable
-fun LoginScreen(loginState: State<LoginState>, onLoginClick: (String, String) -> Unit) {
+fun LoginScreen(error:String?,onLoginClick: (String, String) -> Unit, clearMsg:() -> Unit) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var hasLogin by remember { mutableStateOf(false) }
     val context =  LocalContext.current
-    LaunchedEffect(key1 = loginState.value.error.isNotEmpty()) {
-            Toast.makeText(context, loginState.value.error, Toast.LENGTH_SHORT).show()
-            hasLogin = false
+    LaunchedEffect(key1 = error?.isNotEmpty()) {
+            if (!error.isNullOrEmpty()){
+                Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                hasLogin = false
+                clearMsg()
+            }
     }
 
     Column(
@@ -112,7 +115,9 @@ fun LoginScreen(loginState: State<LoginState>, onLoginClick: (String, String) ->
 @Preview
 @Composable
 private fun LoginPreview() {
-   // LoginScreen()
+    Surface {
+        LoginScreen("",onLoginClick = { email,password-> }, clearMsg = {})
+    }
 }
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
@@ -120,7 +125,7 @@ private fun LoginPreview() {
 private fun LoginDarkPreview() {
     ChatComposeTheme() {
         Surface {
-     //       LoginScreen()
+            LoginScreen("",onLoginClick = { email,password-> }, clearMsg = {})
         }
     }
 }
