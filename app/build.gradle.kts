@@ -76,5 +76,5 @@ dependencies {
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics)
-
+    implementation(libs.androidx.compose.navigation)
 }

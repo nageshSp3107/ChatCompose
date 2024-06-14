@@ -1,27 +1,22 @@
 package com.example
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.chatcompose.LoginState
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class MainActivityViewModel: ViewModel() {
-    private val _loginState = MutableStateFlow(LoginState())
-    val loginState:StateFlow<LoginState> get() = _loginState.asStateFlow()
+    private val _firebaseAuthUserState = MutableStateFlow<FirebaseUser?>(null)
+    val firebaseAuthUserState:StateFlow<FirebaseUser?> get() = _firebaseAuthUserState
     private val _errorState = MutableStateFlow<String?>(null)
     val errorState:StateFlow<String?> get() = _errorState
     fun login(email:String, password:String){
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email,password).addOnSuccessListener {task->
                 if (task.user!=null){
-                    _loginState.update {
-                        it.copy(isSuccess = true, error = "", user = it.user)
+                    _firebaseAuthUserState.update {
+                        task.user
                     }
                 }else{
                     _errorState.update {
@@ -38,5 +33,10 @@ class MainActivityViewModel: ViewModel() {
 
     fun clearErrorState() {
         _errorState.value = null
+    }
+
+    fun clearCacheUser() {
+        clearErrorState()
+        _firebaseAuthUserState.value = null
     }
 }

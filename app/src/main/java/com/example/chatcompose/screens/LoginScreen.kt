@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,19 +37,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.chatcompose.LoginState
 import com.example.chatcompose.ui.theme.ChatComposeTheme
+import com.google.firebase.auth.FirebaseUser
 
 @Composable
-fun LoginScreen(error:String?,onLoginClick: (String, String) -> Unit, clearMsg:() -> Unit) {
+fun LoginScreen(error:String?, user:FirebaseUser?,onLoginClick: (String, String) -> Unit,clearCacheUser:() -> Unit ,clearMsg:() -> Unit,navigateHome:() ->Unit) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var hasLogin by remember { mutableStateOf(false) }
     val context =  LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     LaunchedEffect(key1 = error?.isNotEmpty()) {
             if (!error.isNullOrEmpty()){
                 Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
                 hasLogin = false
                 clearMsg()
             }
+    }
+    LaunchedEffect(key1 = user?.email?.isNotEmpty()) {
+        if (user!=null && user.email != null){
+            Toast.makeText(context, "User Logged In", Toast.LENGTH_SHORT).show()
+            hasLogin = false
+            clearCacheUser()
+            navigateHome()
+        }
     }
 
     Column(
@@ -99,6 +110,7 @@ fun LoginScreen(error:String?,onLoginClick: (String, String) -> Unit, clearMsg:(
         Button(
             modifier = Modifier.fillMaxWidth(),
             onClick = {
+                keyboardController?.hide()
                 hasLogin = true
                 onLoginClick(username,password)
             }) {
@@ -116,7 +128,7 @@ fun LoginScreen(error:String?,onLoginClick: (String, String) -> Unit, clearMsg:(
 @Composable
 private fun LoginPreview() {
     Surface {
-        LoginScreen("",onLoginClick = { email,password-> }, clearMsg = {})
+        LoginScreen("",user = null,onLoginClick = { email,password-> }, clearCacheUser = {} ,clearMsg = {}, navigateHome = {})
     }
 }
 
@@ -125,7 +137,7 @@ private fun LoginPreview() {
 private fun LoginDarkPreview() {
     ChatComposeTheme() {
         Surface {
-            LoginScreen("",onLoginClick = { email,password-> }, clearMsg = {})
+            LoginScreen("",user = null,onLoginClick = { email,password-> }, clearCacheUser = {} ,clearMsg = {}, navigateHome = {})
         }
     }
 }
