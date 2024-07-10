@@ -13,8 +13,8 @@ import com.example.MainActivityViewModel
 import com.example.chatcompose.screens.HomeScreen
 import com.example.chatcompose.screens.LoginScreen
 import com.example.chatcompose.ui.theme.ChatComposeTheme
+import com.example.chatcompose.utilty.Routes
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,9 +28,9 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
-                    startDestination = if (FirebaseAuth.getInstance().currentUser != null) "home" else "login"
+                    startDestination = FirebaseAuth.getInstance().currentUser?.let { Routes.HOME } ?: Routes.LOGIN
                 ) {
-                    composable("login") {
+                    composable(Routes.LOGIN) {
                         LoginScreen(errorState, firebaseUser, { email, password ->
                             mainViewModel.login(email, password)
                         }, clearCacheUser = {
@@ -40,18 +40,18 @@ class MainActivity : ComponentActivity() {
                             //Clear cache error
                             mainViewModel.clearErrorState()
                         }, navigateHome = {
-                            navController.navigate("home") {
-                                popUpTo("login"){
+                            navController.navigate(Routes.HOME) {
+                                popUpTo(Routes.LOGIN){
                                     inclusive = true
                                 }
                             }
                         })
                     }
-                    composable("home") {
+                    composable(Routes.HOME) {
                         HomeScreen(
                             signOutClick = {
-                            navController.navigate("login"){
-                                popUpTo("home"){
+                            navController.navigate(Routes.LOGIN){
+                                popUpTo(Routes.HOME){
                                     inclusive = true
                                 }
                             }
